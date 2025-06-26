@@ -2,10 +2,12 @@ from flask import Flask
 from flask_migrate import Migrate
 from flask_restx import Api
 from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
 
 from config import Config
 
 db = SQLAlchemy()
+ma = Marshmallow()
 
 
 # Create Flask app
@@ -14,6 +16,7 @@ def create_app():
     app.config.from_object(Config)
 
     db.init_app(app)
+    ma.init_app(app)
 
     api = Api(
         app,

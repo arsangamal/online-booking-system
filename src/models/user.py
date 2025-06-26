@@ -1,4 +1,4 @@
-from app import db
+from app import db, ma
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -18,3 +18,15 @@ class User(db.Model):
 
     def to_dict(self):
         return {"id": self.id, "name": self.name, "email": self.email}
+
+
+class UserSchema(ma.Schema):
+    id = ma.Integer(dump_only=True)
+    name = ma.String(required=True)
+    email = ma.Email(required=True)
+    password = ma.String(required=True, load_only=True)
+
+
+class LoginSchema(ma.Schema):
+    email = ma.Email(required=True)
+    password = ma.String(required=True, load_only=True)

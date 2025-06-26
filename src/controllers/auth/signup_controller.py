@@ -1,10 +1,10 @@
 from flask import request
 from flask_restx import Namespace, Resource, fields
-from src.models.user import User
+from src.models.user import User, UserSchema
+from marshmallow import ValidationError
 from app import db
 
 api = Namespace("users", description="users operations")
-
 
 signup_model = api.model(
     "Signup",
@@ -25,14 +25,19 @@ user_response = api.model(
 class SignUp(Resource):
 
     @api.expect(signup_model)
-    @api.marshal_with(user_response, code=201)
+    @api.response(201, "User created successfully", user_response)
+    @api.response(400, "Validation error")
     def post(self):
-        data = request.json
 
-        if User.query.filter(
-            (User.name == data["name"]) | (User.email == data["email"])
-        ).first():
-            api.abort(400, {"error": "Name or email already exists"})
+        try:
+            data = UserSchema().load(request.get_json())
+        except ValidationError as err:
+            return {"errors": err.messages}, 400
+
+        if User.query.filter_by(email=data["email"]).first():
+            return {
+                "errors": {"validation": "User with this email already exists."}
+            }, 400
 
         user = User(name=data["name"], email=data["email"])
         user.set_password(data["password"])
@@ -40,4 +45,5 @@ class SignUp(Resource):
         db.session.add(user)
         db.session.commit()
 
-        return user, 201
+        user_data = UserSchema().dump(user)
+        return user_data, 201
