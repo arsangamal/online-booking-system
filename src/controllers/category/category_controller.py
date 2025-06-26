@@ -1,9 +1,10 @@
-from src.models.author import Author, AuthorSchema
 from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import jwt_required
 from flask import request
 
-api = Namespace("authors", description="Authors operations")
+from src.models.category import Category, CategorySchema
+
+api = Namespace("category", description="Category operations")
 
 request_params = {
     "page": {
@@ -22,21 +23,22 @@ request_params = {
     },
 }
 
-author_model = api.model(
-    "Author",
+category_model = api.model(
+    "Category",
     {
         "id": fields.Integer(required=True, example=1),
-        "name": fields.String(required=True, example="John Doe"),
+        "name": fields.String(required=True, example="Fiction"),
     },
 )
 
+
 @api.route("", methods=["GET"])
-class AuthorController(Resource):
+class CategoryController(Resource):
 
     @jwt_required()
-    @api.response(200, "Authors retrieved successfully", author_model)
+    @api.response(200, "Categories retrieved successfully", category_model)
     @api.response(401, "Unauthorized")
-    @api.response(404, "Authors not found")
+    @api.response(404, "Categories not found")
     @api.doc(
         security=["Bearer Auth"],
         params=request_params,
@@ -44,5 +46,5 @@ class AuthorController(Resource):
     def get(self):
         page = request.args.get("page", 1, type=int)
         per_page = request.args.get("per_page", 10, type=int)
-        authors = Author.query.paginate(page=page, per_page=per_page)
-        return AuthorSchema(many=True).dump(authors.items), 200
+        categories = Category.query.paginate(page=page, per_page=per_page)
+        return CategorySchema(many=True).dump(categories.items), 200
