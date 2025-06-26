@@ -42,9 +42,11 @@ def create_app():
 
     from src.controllers.auth.login_controller import api as login_controller
     from src.controllers.auth.signup_controller import api as signup_controller
-    from src.models import user
+    from src.controllers.author.author_controller import api as author_controller
+    from src.models import user, author
 
     api.add_namespace(login_controller, path="/users")
     api.add_namespace(signup_controller, path="/users")
+    api.add_namespace(author_controller, path="/authors")
 
     return app

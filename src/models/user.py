@@ -16,9 +16,6 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password, password)
 
-    def to_dict(self):
-        return {"id": self.id, "name": self.name, "email": self.email}
-
 
 class UserSchema(ma.Schema):
     id = ma.Integer(dump_only=True)
