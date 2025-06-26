@@ -1,6 +1,6 @@
 from flask_restx import Namespace, Resource
 
-api = Namespace("Authentication", description="Authentication operations")
+api = Namespace("users", description="users operations")
 
 
 @api.route("/login")
