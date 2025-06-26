@@ -8,17 +8,48 @@ services:
     depends_on:
       - db
     environment:
+      - FLASK_ENV=development
+      - FLASK_RUN_HOST='0.0.0.0'
+      - FLASK_RUN_PORT=3000
+      - FLASK_DEBUG=1
       - DATABASE_URL=postgresql://postgres:123456@db/myapp
+    restart: unless-stopped
     volumes:
       - .:/app
+    networks:
+      - default
 
   db:
     image: postgres
     environment:
       - POSTGRES_PASSWORD=123456
+      - POSTGRES_USER=postgres
       - POSTGRES_DB=myapp
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - default
+  
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4
+    restart: always
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: arsan@example.com
+      PGADMIN_DEFAULT_PASSWORD: 123456
+    depends_on:
+      - db
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - default
 
 volumes:
   postgres_data:
+  pgadmin-data:
+
+networks:
+  default:
+    driver: bridge
