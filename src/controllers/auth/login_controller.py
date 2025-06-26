@@ -2,6 +2,7 @@ from flask import request
 from flask_restx import Namespace, Resource, fields
 from src.models.user import LoginSchema, UserSchema, User
 from marshmallow import ValidationError
+from flask_jwt_extended import create_access_token
 
 api = Namespace("users", description="users operations")
 
@@ -36,6 +37,7 @@ class Login(Resource):
     @api.expect(login_model)
     @api.response(200, "Logged in successfully", login_response)
     @api.response(401, "Invalid credentials")
+    @api.doc(security=[])
     def post(self):
         try:
             data = LoginSchema().load(request.json)
@@ -47,7 +49,7 @@ class Login(Resource):
         if not user or not user.check_password(data["password"]):
             api.abort(401, "Invalid email or password")
 
-        token = f"fake-token-for-{user.name}"
+        token = create_access_token(identity=user.id)
         api.logger.info(f"User {user.name} logged in successfully.")
 
         # Serialize the user object using UserSchema

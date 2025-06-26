@@ -27,6 +27,7 @@ class SignUp(Resource):
     @api.expect(signup_model)
     @api.response(201, "User created successfully", user_response)
     @api.response(400, "Validation error")
+    @api.doc(security=[])
     def post(self):
 
         try:
