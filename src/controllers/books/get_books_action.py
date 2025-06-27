@@ -1,7 +1,12 @@
+from config import Config
+from src.filters.book_release_date_filter import BookReleaseDateFilter
+from src.filters.book_price_filter import BookPriceFilter
 from src.models.book import Book, BookSchema
 from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import jwt_required
 from flask import request
+from flask_query_builder.querying import QueryBuilder, AllowedFilter
+
 from . import api
 
 request_params = {
@@ -44,7 +49,20 @@ class GetBooks(Resource):
         params=request_params,
     )
     def get(self):
+        query_builder = QueryBuilder(Book).allowed_filters(
+            [
+                AllowedFilter.custom("price", BookPriceFilter()),
+                AllowedFilter.custom("price_gt", BookPriceFilter()),
+                AllowedFilter.custom("price_lt", BookPriceFilter()),
+                AllowedFilter.custom("release_date", BookReleaseDateFilter()),
+                AllowedFilter.custom("release_date_gt", BookReleaseDateFilter()),
+                AllowedFilter.custom("release_date_lt", BookReleaseDateFilter()),
+            ]
+        )
+
         page = request.args.get("page", 1, type=int)
-        per_page = request.args.get("per_page", 10, type=int)
-        books = Book.query.paginate(page=page, per_page=per_page)
-        return BookSchema(many=True).dump(books.items), 200
+        per_page = min(request.args.get("per_page", 10, type=int), Config.MAX_PER_PAGE)
+
+        books = query_builder.query.paginate(max_per_page=per_page, page=page)
+
+        return BookSchema(many=True).dump(books), 200

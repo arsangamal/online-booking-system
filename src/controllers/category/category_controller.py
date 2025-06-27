@@ -1,3 +1,4 @@
+from config import Config
 from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import jwt_required
 from flask import request
@@ -45,6 +46,6 @@ class CategoryController(Resource):
     )
     def get(self):
         page = request.args.get("page", 1, type=int)
-        per_page = request.args.get("per_page", 10, type=int)
+        per_page = min(request.args.get("per_page", 10, type=int), Config.MAX_PER_PAGE)
         categories = Category.query.paginate(page=page, per_page=per_page)
         return CategorySchema(many=True).dump(categories.items), 200
