@@ -14,13 +14,13 @@ docker compose --profile development up --build
 
 The API will be available at `http://localhost:3000`, the documentation at `http://localhost:3000/docs` and the pgAdmin4 at `http://localhost:8888`.
 
-### To access the PgAdmin4
+### To access PgAdmin4
 - use `arsan@example.com` and `123456` as the UI credentials
-- after login, create a new server with name of your choice and `db` as host, `postgres` as user and `132456` as the password.
+- after login, create a new server with a name of your choice, `db` as host, `postgres` as user, and `123456` as the password (note: both the PgAdmin4 UI and the server use the same credentials: `arsan@example.com` / `123456`).
 
 ## How to turn down the containers
 ```bash
-docker compose --profile development up --build
+docker compose --profile development down
 ```
 
 ## How to Test the Application (Docker Compose)
