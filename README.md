@@ -51,3 +51,6 @@ to turn down the postgres container off
 ## Notes
 ### Don't forget the Bearer word
 to authenticate on swagger, after hitting the `login` endpoint, copy the `access_token` and in the write `Bearer {access_token}` in the authentication box of swagger.
+
+### Database seed
+the app will automatically seed 1 author and 1 category, just for testing purposes, otherwise a seeder should be used, for example [Flask-Seeder](https://pypi.org/project/Flask-Seeder/)
