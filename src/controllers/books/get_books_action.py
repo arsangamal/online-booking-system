@@ -51,6 +51,8 @@ class GetBooks(Resource):
     def get(self):
         query_builder = QueryBuilder(Book).allowed_filters(
             [
+                "category_id",
+                "author_id",
                 AllowedFilter.custom("price", BookPriceFilter()),
                 AllowedFilter.custom("price_gt", BookPriceFilter()),
                 AllowedFilter.custom("price_lt", BookPriceFilter()),
