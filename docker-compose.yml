@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
+    profiles: [development]
     ports:
       - "3000:3000"
     depends_on:
@@ -22,9 +23,10 @@ services:
       - .:/app
     networks:
       - default
-
+  
   db:
     image: postgres
+    profiles: [development]
     environment:
       - POSTGRES_PASSWORD=123456
       - POSTGRES_USER=postgres
@@ -37,6 +39,7 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin4
+    profiles: [development]
     restart: always
     ports:
       - "8888:80"
@@ -50,9 +53,47 @@ services:
     networks:
       - default
 
+  api_test:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    profiles: [testing]
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db_test
+    environment:
+      - FLASK_APP=manage.py
+      - FLASK_ENV=testing
+      - FLASK_RUN_HOST='0.0.0.0'
+      - FLASK_RUN_PORT=3000
+      - FLASK_DEBUG=1
+      - JWT_SECRET_KEY=123456
+      - JWT_ACCESS_TOKEN_EXPIRES=3600
+      - JWT_REFRESH_TOKEN_EXPIRES=86400
+      - DATABASE_URL=postgresql://postgres:123456@db_test/myapp
+    restart: unless-stopped
+    volumes:
+      - .:/app
+    networks:
+      - default
+  
+  db_test:
+    image: postgres
+    profiles: [testing]
+    environment:
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=myapp
+    volumes:
+      - postgres_data_test:/var/lib/postgresql/data
+    networks:
+      - default
+  
 volumes:
   postgres_data:
   pgadmin-data:
+  postgres_data_test:
 
 networks:
   default:
