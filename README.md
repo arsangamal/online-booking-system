@@ -15,7 +15,8 @@ docker compose --profile development up --build
 The API will be available at `http://localhost:3000`, the documentation at `http://localhost:3000/docs` and the pgAdmin4 at `http://localhost:8888`.
 
 ### To access the PgAdmin4
-use `arsan@example.com` and `123456` as the UI credentials
+- use `arsan@example.com` and `123456` as the UI credentials
+- after login, create a new server with name of your choice and `db` as host, `postgres` as user and `132456` as the password.
 
 ## How to turn down the containers
 ```bash
@@ -49,4 +50,4 @@ to turn down the postgres container off
 
 ## Notes
 ### Don't forget the Bearer word
-to authenticate on swagger, after hitting the `login` endpoint, copy the `access_token` and in the write `Bearer {access_token}` in the authentication box of swagger  
+to authenticate on swagger, after hitting the `login` endpoint, copy the `access_token` and in the write `Bearer {access_token}` in the authentication box of swagger.
