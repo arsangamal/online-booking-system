@@ -18,7 +18,8 @@ book_model = api.model(
 
 
 @api.route("/<int:id>", methods=["GET"])
-class GetSpecificBook(Resource):
+class BookDetailsAction(Resource):
+
     @jwt_required()
     @api.response(200, "Book retrieved successfully", book_model)
     @api.response(401, "Unauthorized")
