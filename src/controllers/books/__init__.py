@@ -4,4 +4,4 @@ api = Namespace("books", description="Books operations")
 
 from .get_books_action import GetBooks
 from .get_specific_book_action import GetSpecificBook
-from .create_book_action import CreateBook
+from .create_update_book_action import CreateUpdateBook
