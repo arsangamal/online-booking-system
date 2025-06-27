@@ -48,4 +48,7 @@ class CategoryController(Resource):
         page = request.args.get("page", 1, type=int)
         per_page = min(request.args.get("per_page", 10, type=int), Config.MAX_PER_PAGE)
         categories = Category.query.paginate(page=page, per_page=per_page)
-        return CategorySchema(many=True).dump(categories.items), 200
+        return {
+            "data": CategorySchema(many=True).dump(categories.items),
+            "message": "Categories retrieved successfully.",
+        }, 200

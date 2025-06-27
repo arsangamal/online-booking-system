@@ -27,5 +27,8 @@ class GetSpecificBook(Resource):
     def get(self, id):
         book = Book.query.get(id)
         if not book:
-            abort(404, "Book not found")
-        return BookSchema().dump(book), 200
+            return {"data": None, "message": "Book not found"}, 404
+        return {
+            "data": BookSchema().dump(book),
+            "message": "Book retrieved successfully.",
+        }, 200

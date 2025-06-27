@@ -46,4 +46,7 @@ class AuthorController(Resource):
         page = request.args.get("page", 1, type=int)
         per_page = min(request.args.get("per_page", 10, type=int), Config.MAX_PER_PAGE)
         authors = Author.query.paginate(page=page, per_page=per_page)
-        return AuthorSchema(many=True).dump(authors.items), 200
+        return {
+            "data": AuthorSchema(many=True).dump(authors.items),
+            "message": "Authors retrieved successfully.",
+        }, 200

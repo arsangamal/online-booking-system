@@ -33,11 +33,15 @@ class SignUp(Resource):
         try:
             data = UserSchema().load(request.get_json())
         except ValidationError as err:
-            return {"errors": err.messages}, 400
+            return {
+                "errors": {"validation": err.messages},
+                "message": "Signup failed.",
+            }, 400
 
         if User.query.filter_by(email=data["email"]).first():
             return {
-                "errors": {"validation": "User with this email already exists."}
+                "errors": {"validation": "User with this email already exists."},
+                "message": "Signup failed.",
             }, 400
 
         user = User(name=data["name"], email=data["email"])
@@ -47,4 +51,7 @@ class SignUp(Resource):
         db.session.commit()
 
         user_data = UserSchema().dump(user)
-        return user_data, 201
+        return {
+            "data": user_data,
+            "message": "User created successfully.",
+        }, 201

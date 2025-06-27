@@ -47,7 +47,10 @@ class CreateUpdateBook(Resource):
         try:
             book_data = schema.load(data)
         except ValidationError as err:
-            return {"errors": err.messages}, 400
+            return {
+                "errors": {"validation": err.messages},
+                "message": "Book creation failed.",
+            }, 400
 
         author_id = book_data.get("author_id")
         category_id = book_data.get("category_id")
@@ -56,22 +59,26 @@ class CreateUpdateBook(Resource):
             author = db.session.query(Author).filter_by(id=author_id).first()
             if not author:
                 return {
-                    "error": {"message": f"Author with id {author_id} does not exist."}
+                    "errors": {
+                        "validation": "Author with id {author_id} does not exist."
+                    },
+                    "message": "Book creation failed.",
                 }, 400
 
         if category_id is not None:
             category = db.session.query(Category).filter_by(id=category_id).first()
             if not category:
                 return {
-                    "error": {
-                        "message": f"Category with id {category_id} does not exist."
-                    }
+                    "errors": {
+                        "validation": f"Category with id {category_id} does not exist."
+                    },
+                    "message": "Book creation failed.",
                 }, 400
 
         book = Book(**book_data)
         db.session.add(book)
         db.session.commit()
-        return schema.dump(book), 201
+        return {"data": schema.dump(book), "message": "Book created successfully."}, 201
 
     @jwt_required()
     @api.expect(book_edit_model)
@@ -83,12 +90,18 @@ class CreateUpdateBook(Resource):
     def patch(self):
         data = request.get_json()
         if not data or "id" not in data:
-            return {"error": {"message": "Book id is required."}}, 400
+            return {
+                "errors": {"validation": "Book id is required."},
+                "message": "Book update failed.",
+            }, 400
 
         book_id = data["id"]
         book = Book.query.get(book_id)
         if not book:
-            return {"error": {"message": f"Book with id {book_id} not found."}}, 404
+            return {
+                "errors": {"validation": f"Book with id {book_id} not found."},
+                "message": "Book update failed.",
+            }, 404
 
         # Validate author and category if present
         author_id = data.get("author_id")
@@ -96,7 +109,9 @@ class CreateUpdateBook(Resource):
             author = db.session.query(Author).filter_by(id=author_id).first()
             if not author:
                 return {
-                    "error": {"message": f"Author with id {author_id} does not exist."}
+                    "errors": {
+                        "validation": f"Author with id {author_id} does not exist."
+                    }
                 }, 400
 
         category_id = data.get("category_id")
@@ -104,8 +119,8 @@ class CreateUpdateBook(Resource):
             category = db.session.query(Category).filter_by(id=category_id).first()
             if not category:
                 return {
-                    "error": {
-                        "message": f"Category with id {category_id} does not exist."
+                    "errors": {
+                        "validation": f"Category with id {category_id} does not exist."
                     }
                 }, 400
 
@@ -115,10 +130,16 @@ class CreateUpdateBook(Resource):
             data.pop("id", None)
             book_data = schema.load(data, partial=True)
         except ValidationError as err:
-            return {"errors": err.messages}, 400
+            return {
+                "errors": {"validation": err.messages},
+                "message": "Book update failed.",
+            }, 400
 
         for key, value in book_data.items():
             setattr(book, key, value)
 
         db.session.commit()
-        return BookSchema().dump(book), 200
+        return {
+            "data": BookSchema().dump(book),
+            "message": "Book updated successfully.",
+        }, 200

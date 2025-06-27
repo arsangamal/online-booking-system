@@ -31,6 +31,7 @@ login_response = api.model(
     },
 )
 
+
 @api.route("/login")
 class Login(Resource):
 
@@ -42,15 +43,24 @@ class Login(Resource):
         try:
             data = LoginSchema().load(request.json)
         except ValidationError as err:
-            return {"errors": err.messages}, 400
+            return {
+                "errors": {"validation": err.messages},
+                "message": "Login failed.",
+            }, 400
 
         user = User.query.filter_by(email=data["email"]).first()
 
         if not user or not user.check_password(data["password"]):
-            api.abort(401, "Invalid email or password")
+            return {
+                "errors": {"validation": "Invalid email or password."},
+                "message": "Login failed.",
+            }, 401
 
         token = create_access_token(identity=str(user.id))
 
         # Serialize the user object using UserSchema
         user_data = UserSchema().dump(user)
-        return {"user": user_data, "access_token": token}
+        return {
+            "data": {"user": user_data, "access_token": token},
+            "message": "Logged in successfully",
+        }

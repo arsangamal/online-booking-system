@@ -67,4 +67,7 @@ class GetBooks(Resource):
 
         books = query_builder.query.paginate(max_per_page=per_page, page=page)
 
-        return BookSchema(many=True).dump(books), 200
+        return {
+            "data": BookSchema(many=True).dump(books),
+            "message": "Books retrieved successfully.",
+        }, 200
