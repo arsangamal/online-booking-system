@@ -23,3 +23,5 @@ class BookSchema(ma.Schema):
     release_date = ma.Date(required=True)
     author_id = ma.Integer(required=False)
     category_id = ma.Integer(required=False)
+    author = ma.Nested("AuthorSchema", only=["id", "name"], required=False)
+    category = ma.Nested("CategorySchema", only=["id", "name"], required=False)
